@@ -44,7 +44,6 @@ module HerokuResqueAutoScale
     end
 
     def config
-      puts "config ==> " + Rails.root.join("config/#{CONFIG_FILE_NAME}").to_s if override?
       @config ||= override? ? YAML.load_file(Rails.root.join("config/#{CONFIG_FILE_NAME}").to_s) : YAML.load_file(CONFIG_FILE_NAME)
     end
 
