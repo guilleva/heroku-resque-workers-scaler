@@ -32,15 +32,25 @@ You can change the thresholds, environments of execution and the name of your wo
 
 Exmple YAML file contents:
 
-    thresholds:
-    - :workers: 1
-      :job_count: 1
-    - :workers: 2
-      :job_count: 15
-    environments:
-      - production
-    worker_name: resque
-    
+    queuename:
+      thresholds:
+      - :workers: 1
+        :job_count: 1
+      - :workers: 2
+        :job_count: 15
+      environments:
+        - production
+      worker_name: resque
+    another_queue:
+      thresholds:
+      - :workers: 1
+        :job_count: 1
+      - :workers: 2
+        :job_count: 15
+      environments:
+        - production
+      worker_name: worker2
+
 I just bundled it into a gem for easy inclusion into other projects.
 
 #### Usage

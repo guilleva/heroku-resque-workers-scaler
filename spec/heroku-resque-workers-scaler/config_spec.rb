@@ -8,9 +8,13 @@ describe HerokuResqueAutoScale::Config do
   end
 
   context 'using the supplied config file' do
-    it { HerokuResqueAutoScale::Config.thresholds.should be_instance_of Array }
-    it { HerokuResqueAutoScale::Config.environments.should eql ['production','staging'] }
-    it { HerokuResqueAutoScale::Config.worker_name.should eql 'worker' }
+    it { HerokuResqueAutoScale::Config.thresholds('myqueue').should be_instance_of Array }
+    it { HerokuResqueAutoScale::Config.environments('myqueue').should eql ['production','staging'] }
+    it { HerokuResqueAutoScale::Config.worker_name('myqueue').should eql 'myqueue_worker' }
+
+    it { HerokuResqueAutoScale::Config.thresholds('otherqueue').should be_instance_of Array }
+    it { HerokuResqueAutoScale::Config.environments('otherqueue').should eql ['staging'] }
+    it { HerokuResqueAutoScale::Config.worker_name('otherqueue').should eql 'worker' }
   end
 
   context 'with missing config values' do
@@ -18,11 +22,14 @@ describe HerokuResqueAutoScale::Config do
       HerokuResqueAutoScale::Config.stub(:config).and_return({})
     end
 
-    it { HerokuResqueAutoScale::Config.thresholds.should be_instance_of Array }
-    it { HerokuResqueAutoScale::Config.environments.should eql ['production'] }
-    it { HerokuResqueAutoScale::Config.worker_name.should eql 'worker' }
+    it { HerokuResqueAutoScale::Config.thresholds('myqueue').should be_instance_of Array }
+    it { HerokuResqueAutoScale::Config.environments('myqueue').should eql ['production'] }
+    it { HerokuResqueAutoScale::Config.worker_name('myqueue').should eql 'worker' }
+
+    it { HerokuResqueAutoScale::Config.thresholds('otherqueue').should be_instance_of Array }
+    it { HerokuResqueAutoScale::Config.environments('otherqueue').should eql ['production'] }
+    it { HerokuResqueAutoScale::Config.worker_name('otherqueue').should eql 'worker' }
 
   end
 end
-  
-  
+
