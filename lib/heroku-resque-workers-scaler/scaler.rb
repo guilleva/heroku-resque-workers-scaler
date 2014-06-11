@@ -90,6 +90,7 @@ module HerokuResqueAutoScale
   private
 
   def scale_down
+    min_workers = HerokuResqueAutoScale::Config.min_workers(@queue).include? Rails.env.to_s
     # Nothing fancy, just shut everything down if we have no pending jobs
     # and one working job (which is this job)
     Scaler.scale(@queue.to_s,  0) if Scaler.job_count(@queue.to_s).zero? && Scaler.working_job_count(@queue.to_s) == 1

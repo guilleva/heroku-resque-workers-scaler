@@ -14,6 +14,7 @@ myqueue:
     - production
     - staging
   worker_name: 'myqueue_worker'
+  min_workers: 1
 
 otherqueue:
   thresholds:
@@ -25,3 +26,4 @@ otherqueue:
     :job_count: 60
   environments:
     - staging
+  min_workers: 2

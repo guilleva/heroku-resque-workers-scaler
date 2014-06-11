@@ -26,6 +26,17 @@ module HerokuResqueAutoScale
       end
     end
 
+    def min_workers(queue)
+      @min_workers ||= {}
+      @min_workers[queue] ||= begin
+        if config_file? && config.has_key?(queue) && config[queue].has_key?('min_workers')
+          config[queue]['min_workers'].to_i
+        else
+          0
+        end
+      end
+    end
+
     def worker_name(queue)
       @worker_name ||= {}
       @worker_name[queue] ||= begin

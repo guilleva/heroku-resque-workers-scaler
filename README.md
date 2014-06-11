@@ -41,6 +41,7 @@ Exmple YAML file contents:
       environments:
         - production
       worker_name: resque
+      min_workers: 1
     another_queue:
       thresholds:
       - :workers: 1
@@ -49,7 +50,6 @@ Exmple YAML file contents:
         :job_count: 15
       environments:
         - production
-      worker_name: worker2
 
 I just bundled it into a gem for easy inclusion into other projects.
 
