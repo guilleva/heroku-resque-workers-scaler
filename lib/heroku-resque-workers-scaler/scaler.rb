@@ -46,8 +46,10 @@ module HerokuResqueAutoScale
         ENV['SAFE_MODE'] and ENV['SAFE_MODE'] == 'true'
       end
 
+      # Returns true if there are no more jobs queued and
+      # there is just one working job in the queue (which is this job)
       def all_jobs_hve_been_processed?(queue)
-        job_count(queue) + working_job_count(queue) == 0
+        (job_count(queue) == 0)  && (working_job_count(queue) <= 1)
       end
 
       private
