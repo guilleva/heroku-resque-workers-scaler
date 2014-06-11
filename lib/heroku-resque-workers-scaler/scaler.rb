@@ -8,7 +8,6 @@ module HerokuResqueAutoScale
 
       def workers(queue)
         return -1 unless authorized?(queue)
-        puts "#{ENV['HEROKU_API_KEY']} #{app_name} #{worker_name(queue)}"
         result = @@heroku.formation.info(app_name, worker_name(queue))
         result['quantity']
       end
@@ -16,7 +15,7 @@ module HerokuResqueAutoScale
       def scale(queue, quantity)
         return unless authorized?(queue)
 
-        quantity = quantity.to_i
+        quantity = [quantity.to_i, min_workers(queue)].max
 
         if safe_mode? and setting_this_number_of_workers_will_scale_down?(queue, quantity)
           return unless all_jobs_hve_been_processed?(queue)
@@ -60,6 +59,10 @@ module HerokuResqueAutoScale
       def worker_name(queue)
         HerokuResqueAutoScale::Config.worker_name(queue)
       end
+
+      def min_workers(queue)
+        HerokuResqueAutoScale::Config.min_workers(queue)
+      end
     end
   end
 
@@ -90,7 +93,6 @@ module HerokuResqueAutoScale
   private
 
   def scale_down
-    min_workers = HerokuResqueAutoScale::Config.min_workers(@queue)
     # Nothing fancy, just shut everything down if we have no pending jobs
     # and one working job (which is this job)
     Scaler.scale(@queue.to_s,  0) if Scaler.job_count(@queue.to_s).zero? && Scaler.working_job_count(@queue.to_s) == 1
