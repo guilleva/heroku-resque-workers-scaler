@@ -10,6 +10,8 @@ module HerokuResqueAutoScale
         return -1 unless authorized?(queue)
         result = @@heroku.formation.info(app_name, worker_name(queue))
         result['quantity']
+      rescue Excon::Errors::ServiceUnavailable
+        # api down!
       end
 
       def scale(queue, quantity)
@@ -22,7 +24,11 @@ module HerokuResqueAutoScale
         end
         result = @@heroku.formation.update(app_name, worker_name(queue), {quantity: quantity})
         result['quantity'] == quantity
+      # Recover from Heroku API conection errors
+      rescue Excon::Errors::ServiceUnavailable
+        false
       end
+
 
       def job_count(queue)
         Resque.size(queue).to_i
@@ -84,7 +90,8 @@ module HerokuResqueAutoScale
       # If we have a job count greater than or equal to the job limit for this scale info
       if Scaler.job_count(@queue.to_s) >= scale_info[:job_count]
         # Set the number of workers unless they are already set to a level we want. Don't scale down here!
-        if Scaler.workers(@queue.to_s) <= scale_info[:workers]
+        workers = Scaler.workers(@queue.to_s) # Can return nil if api down
+        if workers.present? && workers <= scale_info[:workers]
           Scaler.scale @queue.to_s, scale_info[:workers]
         end
         break # We've set or ensured that the worker count is high enough

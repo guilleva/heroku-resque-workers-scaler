@@ -59,6 +59,17 @@ describe HerokuResqueAutoScale::Scaler do
       end
     end
 
+    context 'with heroku API down' do
+      before do
+        PlatformAPI::Client.any_instance.stub_chain(:formation, :info).and_raise(Excon::Errors::ServiceUnavailable.new('error'))
+        PlatformAPI::Client.any_instance.stub_chain(:formation, :update).and_raise(Excon::Errors::ServiceUnavailable.new('error'))
+      end
+
+      it 'does not raise and error' do
+        HerokuResqueAutoScale::Scaler.send(:scale , 'myqueue', '69')
+      end
+    end
+
     context 'with safe mode enabled' do
       before { HerokuResqueAutoScale::Scaler.stub safe_mode?: true }
 
@@ -70,7 +81,7 @@ describe HerokuResqueAutoScale::Scaler do
 
           it 'does not trigger the API call' do
             PlatformAPI::Client.any_instance.should_not_receive(:formation)
-            HerokuResqueAutoScale::Scaler.send(:scale , 'myqueue', '69')
+            HerokuResqueAutoScale::Scaler.send(:scale , 'myqueue', '69').should be_false
           end
         end
 
